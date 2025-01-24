@@ -1,0 +1,6 @@
+vari = "John Snow"
+my_vari ="John Snow"
+_my_var = "John Snow"
+myVar = "John Snow"
+MYVAR = "John Snow"
+myvar2 = "John Snow"
