@@ -1,0 +1,8 @@
+thisdict =	{
+  "brand": "Ford",
+  "model": "Mustang",
+  "year": 1964
+}
+#thisdict.update({"color": "red"}) 
+thisdict["color"] = "red"
+print(thisdict)
