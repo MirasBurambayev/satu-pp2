@@ -46,16 +46,16 @@ def message(msg, color):
 
 # Получение ID пользователя или создание
 def get_or_create_user(username):
-    conn = psycopg2.connect(**load_config())
+    conn = psycopg2.connect(**load_config()) # Подключение к базе
     cur = conn.cursor()
-    cur.execute("SELECT id FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT id FROM users WHERE username = %s", (username,))# Проверяем, есть ли такой пользователь
     user = cur.fetchone()
     if user:
-        user_id = user[0]
+        user_id = user[0] # Если найден — берём его id
     else:
-        cur.execute("INSERT INTO users (username) VALUES (%s) RETURNING id", (username,))
+        cur.execute("INSERT INTO users (username) VALUES (%s) RETURNING id", (username,))  # Иначе добавляем нового
         user_id = cur.fetchone()[0]
-        conn.commit()
+        conn.commit() # Сохраняем изменения в БД
     cur.close()
     conn.close()
     return user_id
@@ -64,11 +64,11 @@ def get_or_create_user(username):
 def get_user_progress(user_id):
     conn = psycopg2.connect(**load_config())
     cur = conn.cursor()
-    cur.execute("SELECT level, score FROM user_score WHERE user_id = %s ORDER BY id DESC LIMIT 1", (user_id,))
-    result = cur.fetchone()
+    cur.execute("SELECT level, score FROM user_score WHERE user_id = %s ORDER BY id DESC LIMIT 1", (user_id,)) 
+    result = cur.fetchone()# Берём последние данные по уровню и счёту
     cur.close()
     conn.close()
-    return result if result else (1, 0)
+    return result if result else (1, 0) # Если нет записей — возвращаем уровень 1, счёт 0
 
 # Сохранение прогресса
 def save_progress(user_id, level, score):
@@ -82,25 +82,26 @@ def save_progress(user_id, level, score):
 
 # Главный игровой цикл
 def gameLoop():
-    username = input("Введите имя пользователя: ")
-    user_id = get_or_create_user(username)
-    level, score = get_user_progress(user_id)
-
+    username = input("Введите имя пользователя: ")# Запрашиваем имя игрока
+    user_id = get_or_create_user(username)# Ищем или создаём пользователя
+    level, score = get_user_progress(user_id)# Загружаем прогресс
+    # Стартовые координаты головы змеи
     x1 = dis_width / 2
     y1 = dis_height / 2
     x1_change = 0
     y1_change = 0
 
     snake_List = []
-    Length_of_snake = score + 1
-    speed = start_speed + (level - 1) * 2
+    Length_of_snake = score + 1 # Длина зависит от счёта
+    speed = start_speed + (level - 1) * 2  # Скорость увеличивается с каждым уровнем
 
+    # Настройки еды
     foodx = 0
     foody = 0
     food_weight = 1
     food_timer = 0
     food_lifetime = 100
-
+     # Функция генерации еды
     def spawn_food():
         fx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
         fy = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
@@ -114,7 +115,7 @@ def gameLoop():
 
     while not game_over:
 
-        # ОБРАБОТКА СОБЫТИЙ (работают Q, C, P всегда)
+        # Обработка событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 save_progress(user_id, level, score)
@@ -143,27 +144,27 @@ def gameLoop():
                 elif event.key == pygame.K_p:
                     save_progress(user_id, level, score)
                     game_close = True
-
+        # Проверка выхода змеи за границы окна
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
-
+        # Обновляем координаты змеи
         x1 += x1_change
         y1 += y1_change
         dis.fill(blue)
 
         food_color = green if food_weight == 1 else (255, 204, 0) if food_weight == 2 else red
         pygame.draw.rect(dis, food_color, [foodx, foody, snake_block, snake_block])
-
+        # Обновление таймера еды
         food_timer -= 1
         if food_timer <= 0:
             foodx, foody, food_weight = spawn_food()
             food_timer = food_lifetime
-
+        # Движение змеи
         snake_Head = [x1, y1]
         snake_List.append(snake_Head)
         if len(snake_List) > Length_of_snake:
             del snake_List[0]
-
+        # Проверка столкновения головы с телом
         for segment in snake_List[:-1]:
             if segment == snake_Head:
                 game_close = True
@@ -171,7 +172,7 @@ def gameLoop():
         draw_snake(snake_block, snake_List)
         show_info(score, level)
         pygame.display.update()
-
+         # Проверка на съедание еды
         if x1 == foodx and y1 == foody:
             score += food_weight
             Length_of_snake += food_weight
