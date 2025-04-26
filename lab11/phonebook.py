@@ -27,7 +27,7 @@ def insert_from_console():
     cur.close()
     conn.close()
 # Функция для вставки данных из CSV-файла
-def insert_from_csv(filename='insert.csv'):
+def insert_from_csv(filename=r'C:\vscode\labs\.vscode\.vscode\lab11\insert.csv'):
     conn = psycopg2.connect(**load_config())
     cur = conn.cursor()
     # Открываем CSV-файл на чтение
