@@ -5,4 +5,4 @@ name = "test.txt"
 
 with open(path, "r") as file:
     lines = file.readlines()
-    print(len(lines))    
+    print(lines)    

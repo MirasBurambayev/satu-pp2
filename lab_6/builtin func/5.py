@@ -1,3 +1,3 @@
-a = (1, 2 ,3 )
+a = (0, False ,3 )
 
 print(all(a))

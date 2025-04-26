@@ -150,7 +150,7 @@ def gameLoop():
             # Повышение уровня(solo leveling)
             if score // 5 + 1 > level:
                 level += 1
-                speed += 2
+                speed += 223
 
         clock.tick(speed)
 
